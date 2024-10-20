@@ -1,7 +1,7 @@
 
 # Sistema de Solicitação de Empréstimo
 
-Este projeto consiste em um sistema completo para solicitação de empréstimos, implementado com um backend em Node.js usando Express e um frontend em React. O sistema permite que os usuários preencham um formulário com suas informações pessoais e recebam uma proposta de empréstimo com base nos dados fornecidos.
+Este projeto consiste em um sistema simples para solicitação de empréstimos, implementado com um backend em Node.js usando Express e um frontend em React. O sistema permite que os usuários preencham um formulário com suas informações pessoais e recebam uma proposta de empréstimo com base nos dados fornecidos.
 
 ## Tecnologias Utilizadas
 
