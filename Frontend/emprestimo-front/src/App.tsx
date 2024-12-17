@@ -1,170 +1,37 @@
-'use client'
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import EmprestimoForm from "./components/EmprestimoForm";
+import ChatBot from "./components/ChatBot";
 
-import { useState } from 'react'
-import axios from 'axios'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+const App: React.FC = () => {
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
 
-const formSchema = z.object({
-  nome: z.string().min(2, {
-    message: "Nome deve ter pelo menos 2 caracteres.",
-  }),
-  cpf: z.string().length(11, {
-    message: "CPF deve ter 11 dígitos.",
-  }),
-  idade: z.string().min(1, {
-    message: "Idade é obrigatória.",
-  }),
-  salario: z.string().min(1, {
-    message: "Salário é obrigatório.",
-  }),
-  localizacao: z.string().length(2, {
-    message: "Localização deve ser a sigla do estado (ex: SP).",
-  }),
-})
-
-interface ResponseData {
-  usuario: string
-  dados: Array<{
-    type: string
-    taxa: number
-  }>
-}
-
-export default function EmprestimoForm() {
-  const [response, setResponse] = useState<ResponseData | null>(null)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      nome: "",
-      cpf: "",
-      idade: "",
-      salario: "",
-      localizacao: "",
-    },
-  })
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const res = await axios.post('http://localhost:3000/emprestimo', values)
-      setResponse(res.data)
-    } catch (error) {
-      console.error('Erro ao enviar os dados:', error)
-    }
-  }
+  // Função para alternar o estado do ChatBot (abrir/fechar)
+  const toggleChatBot = () => {
+    setIsChatBotOpen(!isChatBotOpen);
+  };
 
   return (
-    <div className="container mx-auto p-6 max-w-2xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>Solicitação de Empréstimo</CardTitle>
-          <CardDescription>Preencha o formulário para solicitar um empréstimo.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Seu nome completo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="cpf"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CPF</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Seu CPF (apenas números)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="idade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Idade</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Sua idade" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="salario"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Salário</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Seu salário" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="localizacao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Localização</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Sigla do estado (ex: SP)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">Enviar</Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+    <Router>
+      {/* Definindo as rotas da aplicação */}
+      <Routes>
+        <Route path="/" element={<EmprestimoForm />} />
+      </Routes>
 
-      {response && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Resposta do Servidor</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-semibold">Usuário: {response.usuario}</p>
-            <p className="mt-2 font-semibold">Dados:</p>
-            <ul className="list-disc pl-5 mt-2">
-              {response.dados.map((item, index) => (
-                <li key={index}>
-                  Tipo: {item.type}, Taxa: {item.taxa}%
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+      {/* Botão flutuante do ChatBot */}
+      {!isChatBotOpen && (
+        <div
+          onClick={toggleChatBot}
+          className="fixed bottom-10 left-10 p-4 bg-blue-500 text-white rounded-full cursor-pointer shadow-lg hover:bg-blue-600 transition duration-300"
+        >
+          💬
+        </div>
       )}
-    </div>
-  )
-}
+
+      {/* Renderiza o ChatBot apenas quando está aberto */}
+      {isChatBotOpen && <ChatBot toggleChatBot={toggleChatBot} />}
+    </Router>
+  );
+};
+
+export default App;
